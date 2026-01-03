@@ -6,7 +6,7 @@ static const int MOD = 1e9 + 7;
 vector<vector<int>> tree;
 vector<long long> fact, invFact;
 
-// Fast exponentiation
+// Fast power
 long long power(long long a, long long b) {
     long long res = 1;
     while (b) {
@@ -17,29 +17,33 @@ long long power(long long a, long long b) {
     return res;
 }
 
+// nCr
 long long nCr(int n, int r) {
     if (r < 0 || r > n) return 0;
     return fact[n] * invFact[r] % MOD * invFact[n - r] % MOD;
 }
 
 // DFS returns {ways, subtree_size}
-pair<long long,int> dfs(int node) {
+pair<long long, int> dfs(int node) {
     long long ways = 1;
     int size = 0;
 
     for (int child : tree[node]) {
-        auto [childWays, childSize] = dfs(child);
+        auto temp = dfs(child);
+        long long childWays = temp.first;
+        int childSize = temp.second;
+
         ways = ways * childWays % MOD;
         ways = ways * nCr(size + childSize, childSize) % MOD;
         size += childSize;
     }
 
-    return {ways, size + 1};
+    return make_pair(ways, size + 1);
 }
 
 int waysToBuildRooms(vector<int>& prevRoom) {
     int n = prevRoom.size();
-    tree.resize(n);
+    tree.assign(n, vector<int>());
 
     for (int i = 1; i < n; i++)
         tree[prevRoom[i]].push_back(i);
@@ -61,6 +65,6 @@ int waysToBuildRooms(vector<int>& prevRoom) {
 
 int main() {
     vector<int> prevRoom = {-1,0,0,1,2};
-    cout << waysToBuildRooms(prevRoom);
+    cout << waysToBuildRooms(prevRoom) << endl;
     return 0;
 }
